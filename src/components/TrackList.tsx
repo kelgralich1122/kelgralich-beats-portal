@@ -162,20 +162,34 @@ const TrackList = ({
       // Upload audio file
       const audioFilePath = `audio/${Date.now()}-${audioFile.name}`;
       
-      // Custom upload with progress tracking
+      // Manual progress tracking
+      let uploadedBytes = 0;
+      const totalBytes = audioFile.size;
+      
+      // Use XMLHttpRequest to track upload progress
+      const xhr = new XMLHttpRequest();
+      
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(percentComplete);
+          uploadedBytes = event.loaded;
+        }
+      });
+      
+      // Use standard Supabase upload without onUploadProgress
       const { error: audioUploadError } = await supabase.storage
         .from('music-assets')
         .upload(audioFilePath, audioFile, {
-          upsert: true,
-          onUploadProgress: (progress) => {
-            const percent = Math.round((progress.loaded / progress.total) * 100);
-            setUploadProgress(percent);
-          }
+          upsert: true
         });
 
       if (audioUploadError) {
         throw new Error(`Audio upload error: ${audioUploadError.message}`);
       }
+      
+      // Set progress to 100% when upload is complete
+      setUploadProgress(100);
 
       // Get the public URL for the audio
       const { data: audioPublicUrlData } = await supabase.storage
