@@ -1,5 +1,5 @@
 
-import { Music2, Headphones, Speaker, Wave } from "lucide-react";
+import { Music2, Headphones, Speaker, Waves } from "lucide-react";
 import { aboutContent } from "@/utils/musicData";
 
 const About = () => {
@@ -62,7 +62,7 @@ const About = () => {
               
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-music-accent/10 flex items-center justify-center">
-                  <Wave size={18} className="text-music-accent" />
+                  <Waves size={18} className="text-music-accent" />
                 </div>
                 <div>
                   <h3 className="font-medium">Rhythmic Innovation</h3>
