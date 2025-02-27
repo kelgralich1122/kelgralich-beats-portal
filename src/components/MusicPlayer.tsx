@@ -1,6 +1,5 @@
-
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Track } from "@/utils/musicData";
 
 interface MusicPlayerProps {
@@ -18,154 +17,196 @@ const MusicPlayer = ({
   isPlaying, 
   setIsPlaying 
 }: MusicPlayerProps) => {
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const currentTrack = tracks[currentTrackIndex];
-
   useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = isMuted ? 0 : volume;
+
     if (isPlaying) {
-      audioRef.current?.play();
+      audio.play().catch(error => {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      });
     } else {
-      audioRef.current?.pause();
+      audio.pause();
     }
-  }, [isPlaying, currentTrackIndex]);
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const handleEnded = () => {
+      if (currentTrackIndex < tracks.length - 1) {
+        setCurrentTrackIndex(currentTrackIndex + 1);
+      } else {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      }
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [isPlaying, volume, isMuted, currentTrackIndex, setCurrentTrackIndex, setIsPlaying, tracks.length]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    setCurrentTime(0);
+
+    if (isPlaying) {
+      audio.play().catch(error => {
+        console.error("Error playing new track:", error);
+        setIsPlaying(false);
+      });
     }
-  }, [volume]);
+  }, [currentTrackIndex, isPlaying, setIsPlaying]);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
   const handlePrevious = () => {
-    setCurrentTrackIndex(currentTrackIndex === 0 ? tracks.length - 1 : currentTrackIndex - 1);
+    if (currentTime > 3) {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+      }
+    } else {
+      setCurrentTrackIndex(currentTrackIndex === 0 ? tracks.length - 1 : currentTrackIndex - 1);
+    }
   };
 
   const handleNext = () => {
     setCurrentTrackIndex((currentTrackIndex + 1) % tracks.length);
   };
 
-  const handleTimeUpdate = () => {
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (isMuted && newVolume > 0) {
+      setIsMuted(false);
+    }
     if (audioRef.current) {
-      const current = audioRef.current.currentTime;
-      const duration = audioRef.current.duration;
-      setProgress((current / duration) * 100);
-      setCurrentTime(current);
-      setDuration(duration);
+      audioRef.current.volume = newVolume;
     }
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
     if (audioRef.current) {
-      const bounds = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - bounds.left;
-      const width = bounds.width;
-      const percentage = x / width;
-      const newTime = percentage * audioRef.current.duration;
+      audioRef.current.volume = !isMuted ? 0 : volume;
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (audioRef.current) {
       audioRef.current.currentTime = newTime;
-      setProgress(percentage * 100);
     }
   };
 
-  const formatTime = (time: number) => {
-    if (isNaN(time)) return "0:00";
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
-  const VolumeIcon = () => {
-    if (volume === 0) return <VolumeX size={20} />;
-    if (volume < 0.5) return <Volume1 size={20} />;
-    return <Volume2 size={20} />;
-  };
+  const currentTrack = tracks[currentTrackIndex];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="glass-effect p-4 mx-auto max-w-7xl">
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:block">
-            <img 
-              src={currentTrack.coverArt} 
-              alt={currentTrack.title} 
-              className="w-12 h-12 rounded-md object-cover"
-            />
+    <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 p-3 z-50">
+      <div className="max-w-7xl mx-auto grid grid-cols-12 items-center gap-4">
+        <div className="col-span-12 md:col-span-3 flex items-center gap-3">
+          <img 
+            src={currentTrack?.coverArt || 'https://via.placeholder.com/40'} 
+            alt={currentTrack?.title || 'Track'} 
+            className="w-12 h-12 rounded object-cover"
+          />
+          <div className="truncate">
+            <h4 className="text-white font-medium truncate">{currentTrack?.title || 'No track selected'}</h4>
+            <p className="text-gray-400 text-sm">Kelgralich</p>
           </div>
-          
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-sm font-medium text-white">{currentTrack.title}</h3>
-                <p className="text-xs text-gray-400">Kelgralich</p>
-              </div>
-              <div className="text-xs text-gray-400 hidden sm:block">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </div>
-            </div>
-            
-            <div 
-              className="track-progress cursor-pointer" 
-              onClick={handleSeek}
-            >
-              <div 
-                className="track-progress-bar" 
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 ml-4">
+        </div>
+        
+        <div className="col-span-12 md:col-span-6 flex flex-col items-center justify-center">
+          <div className="flex items-center gap-4 mb-2">
             <button 
+              className="text-gray-300 hover:text-white transition-colors"
               onClick={handlePrevious}
-              className="text-white/70 hover:text-white transition-colors"
             >
               <SkipBack size={20} />
             </button>
-            
             <button 
+              className="bg-music-accent rounded-full w-10 h-10 flex items-center justify-center text-white hover:bg-music-accent/80 transition-colors"
               onClick={handlePlayPause}
-              className="w-10 h-10 rounded-full bg-music-accent flex items-center justify-center hover:bg-music-highlight transition-colors"
             >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-1" />}
+              {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
             </button>
-            
             <button 
+              className="text-gray-300 hover:text-white transition-colors"
               onClick={handleNext}
-              className="text-white/70 hover:text-white transition-colors"
             >
               <SkipForward size={20} />
             </button>
           </div>
           
-          <div className="hidden md:flex items-center gap-2 ml-6">
-            <button className="text-white/70 hover:text-white transition-colors">
-              <VolumeIcon />
-            </button>
+          <div className="w-full flex items-center gap-2">
+            <span className="text-xs text-gray-400 w-10 text-right">{formatTime(currentTime)}</span>
             <input
               type="range"
               min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-              className="w-20 h-1 accent-music-accent bg-white/20 rounded-full"
+              max={duration || 100}
+              step="0.1"
+              value={currentTime}
+              onChange={handleSeek}
+              className="flex-grow h-1 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
             />
+            <span className="text-xs text-gray-400 w-10">{formatTime(duration)}</span>
           </div>
         </div>
+        
+        <div className="col-span-12 md:col-span-3 flex items-center justify-end gap-2">
+          <button 
+            className="text-gray-300 hover:text-white transition-colors"
+            onClick={toggleMute}
+          >
+            {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="w-24 h-1 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+          />
+        </div>
       </div>
-      
-      <audio
-        ref={audioRef}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={handleNext}
-        src={currentTrack.audioSrc || ""}
+
+      <audio 
+        ref={audioRef} 
+        src={currentTrack?.audioSrc || ''} 
+        preload="metadata"
       />
     </div>
   );
