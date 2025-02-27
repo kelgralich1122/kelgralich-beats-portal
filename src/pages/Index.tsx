@@ -1,12 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import TrackList from "@/components/TrackList";
+import MusicPlayer from "@/components/MusicPlayer";
+import About from "@/components/About";
+import Footer from "@/components/Footer";
+import { tracks } from "@/utils/musicData";
 
 const Index = () => {
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="bg-gradient-to-b from-music-darker to-music-dark min-h-screen">
+      <Navbar />
+      <Hero />
+      <TrackList 
+        tracks={tracks}
+        currentTrackIndex={currentTrackIndex}
+        setCurrentTrackIndex={setCurrentTrackIndex}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+      />
+      <About />
+      <Footer />
+      <MusicPlayer 
+        tracks={tracks}
+        currentTrackIndex={currentTrackIndex}
+        setCurrentTrackIndex={setCurrentTrackIndex}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+      />
     </div>
   );
 };
