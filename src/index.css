@@ -157,3 +157,52 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-music-accent/50;
 }
+
+@keyframes waveform-1 {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes waveform-2 {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.3); }
+}
+
+@keyframes waveform-3 {
+  0%, 100% { transform: scaleY(0.7); }
+  50% { transform: scaleY(0.4); }
+}
+
+@keyframes waveform-4 {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(0.9); }
+}
+
+.animate-waveform-1 {
+  animation: waveform-1 1.2s ease-in-out infinite;
+}
+
+.animate-waveform-2 {
+  animation: waveform-2 1s ease-in-out infinite;
+}
+
+.animate-waveform-3 {
+  animation: waveform-3 1.4s ease-in-out infinite;
+}
+
+.animate-waveform-4 {
+  animation: waveform-4 0.8s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
