@@ -11,7 +11,8 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Only create client if both URL and key are available
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const Index = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -23,7 +24,7 @@ const Index = () => {
     const fetchTracks = async () => {
       try {
         setLoading(true);
-        if (!supabaseUrl || !supabaseAnonKey) {
+        if (!supabase) {
           console.log("Using demo tracks: Supabase credentials not configured");
           setLoading(false);
           return;
@@ -62,7 +63,7 @@ const Index = () => {
     fetchTracks();
 
     // Only set up subscription if Supabase is configured
-    if (supabaseUrl && supabaseAnonKey) {
+    if (supabase) {
       const tracksSubscription = supabase
         .channel('tracks-changes')
         .on('postgres_changes', { 

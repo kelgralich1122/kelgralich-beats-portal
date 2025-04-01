@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Track } from "@/utils/musicData";
 import { Play, Pause, Clock, Calendar, Search, Upload, X } from "lucide-react";
@@ -13,10 +12,11 @@ interface TrackListProps {
   setIsPlaying: (isPlaying: boolean) => void;
 }
 
-// Initialize Supabase client
+// Initialize Supabase client only if URL and key are available
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Only create client if both URL and key are available
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const TrackList = ({ 
   tracks, 
@@ -132,6 +132,16 @@ const TrackList = ({
       return;
     }
 
+    // Check if Supabase is properly initialized
+    if (!supabase) {
+      toast({
+        title: "Upload not available",
+        description: "Supabase connection is not configured. Please contact the administrator.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -177,7 +187,7 @@ const TrackList = ({
         }
       });
       
-      // Use standard Supabase upload without onUploadProgress
+      // Use standard Supabase upload
       const { error: audioUploadError } = await supabase.storage
         .from('music-assets')
         .upload(audioFilePath, audioFile, {
@@ -232,9 +242,6 @@ const TrackList = ({
         description: ""
       });
       setUploadModalOpen(false);
-      
-      // Refresh tracks (ideally from database, but for now rely on page refresh)
-      // In a real application, you would fetch the updated tracks list from Supabase here
       
     } catch (error) {
       toast({
