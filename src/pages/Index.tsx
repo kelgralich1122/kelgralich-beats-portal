@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -22,6 +23,12 @@ const Index = () => {
     const fetchTracks = async () => {
       try {
         setLoading(true);
+        if (!supabaseUrl || !supabaseAnonKey) {
+          console.log("Using demo tracks: Supabase credentials not configured");
+          setLoading(false);
+          return;
+        }
+        
         const { data, error } = await supabase
           .from('tracks')
           .select('*')
@@ -54,24 +61,27 @@ const Index = () => {
 
     fetchTracks();
 
-    const tracksSubscription = supabase
-      .channel('tracks-changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'tracks' 
-      }, () => {
-        fetchTracks();
-      })
-      .subscribe();
+    // Only set up subscription if Supabase is configured
+    if (supabaseUrl && supabaseAnonKey) {
+      const tracksSubscription = supabase
+        .channel('tracks-changes')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'tracks' 
+        }, () => {
+          fetchTracks();
+        })
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(tracksSubscription);
-    };
+      return () => {
+        supabase.removeChannel(tracksSubscription);
+      };
+    }
   }, []);
 
   return (
-    <div className="bg-gradient-to-b from-music-darker to-music-dark min-h-screen">
+    <div className="bg-gradient-to-b from-music-darker to-music-dark min-h-screen text-white">
       <Navbar />
       <Hero />
       <TrackList 
