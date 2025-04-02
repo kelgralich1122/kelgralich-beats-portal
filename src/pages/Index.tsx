@@ -8,6 +8,7 @@ import About from "@/components/About";
 import Footer from "@/components/Footer";
 import { tracks as demoTracks, Track } from "@/utils/musicData";
 import { createClient } from "@supabase/supabase-js";
+import { X, ListMusic } from "lucide-react";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -19,6 +20,7 @@ const Index = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [tracks, setTracks] = useState<Track[]>(demoTracks);
   const [loading, setLoading] = useState(true);
+  const [showMusicPlayer, setShowMusicPlayer] = useState(true);
 
   useEffect(() => {
     const fetchTracks = async () => {
@@ -81,6 +83,10 @@ const Index = () => {
     }
   }, []);
 
+  const toggleMusicPlayer = () => {
+    setShowMusicPlayer(!showMusicPlayer);
+  };
+
   return (
     <div className="bg-gradient-to-b from-music-darker to-music-dark min-h-screen text-white">
       <Navbar />
@@ -94,13 +100,25 @@ const Index = () => {
       />
       <About />
       <Footer />
-      <MusicPlayer 
-        tracks={tracks}
-        currentTrackIndex={currentTrackIndex}
-        setCurrentTrackIndex={setCurrentTrackIndex}
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-      />
+      
+      {/* Music Player Toggle Button */}
+      <button 
+        onClick={toggleMusicPlayer}
+        className="fixed bottom-20 right-4 z-50 bg-music-accent rounded-full p-3 shadow-lg hover:bg-music-accent/80 transition-colors"
+        aria-label={showMusicPlayer ? "Hide Music Player" : "Show Music Player"}
+      >
+        {showMusicPlayer ? <X size={20} /> : <ListMusic size={20} />}
+      </button>
+      
+      {showMusicPlayer && (
+        <MusicPlayer 
+          tracks={tracks}
+          currentTrackIndex={currentTrackIndex}
+          setCurrentTrackIndex={setCurrentTrackIndex}
+          isPlaying={isPlaying}
+          setIsPlaying={setIsPlaying}
+        />
+      )}
     </div>
   );
 };

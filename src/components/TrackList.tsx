@@ -43,6 +43,14 @@ const TrackList = ({
   const audioFileRef = useRef<HTMLInputElement>(null);
   const coverImageRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [supabaseConfigured, setSupabaseConfigured] = useState(supabase !== null);
+
+  useEffect(() => {
+    // Check if Supabase is properly configured
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setSupabaseConfigured(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Filter tracks when search term changes
@@ -136,7 +144,7 @@ const TrackList = ({
     if (!supabase) {
       toast({
         title: "Upload not available",
-        description: "Supabase connection is not configured. Please contact the administrator.",
+        description: "Supabase connection is not configured. Demo mode is active - upload is disabled.",
         variant: "destructive"
       });
       return;
@@ -146,6 +154,27 @@ const TrackList = ({
     setUploadProgress(0);
 
     try {
+      // Verify storage buckets exist before uploading
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        throw new Error(`Storage bucket error: ${bucketsError.message}`);
+      }
+      
+      // Check if music-assets bucket exists
+      const musicAssetsBucket = buckets?.find(b => b.name === 'music-assets');
+      
+      if (!musicAssetsBucket) {
+        // Create bucket if it doesn't exist
+        const { error: createBucketError } = await supabase.storage.createBucket('music-assets', {
+          public: true
+        });
+        
+        if (createBucketError) {
+          throw new Error(`Failed to create storage bucket: ${createBucketError.message}`);
+        }
+      }
+
       // Upload cover image first if provided
       let coverArtUrl = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400';
       
@@ -171,21 +200,7 @@ const TrackList = ({
 
       // Upload audio file
       const audioFilePath = `audio/${Date.now()}-${audioFile.name}`;
-      
-      // Manual progress tracking
-      let uploadedBytes = 0;
-      const totalBytes = audioFile.size;
-      
-      // Use XMLHttpRequest to track upload progress
-      const xhr = new XMLHttpRequest();
-      
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(percentComplete);
-          uploadedBytes = event.loaded;
-        }
-      });
+      setUploadProgress(10);
       
       // Use standard Supabase upload
       const { error: audioUploadError } = await supabase.storage
@@ -198,8 +213,7 @@ const TrackList = ({
         throw new Error(`Audio upload error: ${audioUploadError.message}`);
       }
       
-      // Set progress to 100% when upload is complete
-      setUploadProgress(100);
+      setUploadProgress(70);
 
       // Get the public URL for the audio
       const { data: audioPublicUrlData } = await supabase.storage
@@ -207,6 +221,7 @@ const TrackList = ({
         .getPublicUrl(audioFilePath);
 
       const audioUrl = audioPublicUrlData.publicUrl;
+      setUploadProgress(80);
 
       // Insert the track data into the database
       const { error: insertError } = await supabase
@@ -226,6 +241,7 @@ const TrackList = ({
         throw new Error(`Database insert error: ${insertError.message}`);
       }
 
+      setUploadProgress(100);
       toast({
         title: "Track uploaded successfully",
         description: "Your track has been uploaded and will appear in the list shortly.",
@@ -293,7 +309,17 @@ const TrackList = ({
             
             {/* Upload button */}
             <button
-              onClick={() => setUploadModalOpen(true)}
+              onClick={() => {
+                if (!supabaseConfigured) {
+                  toast({
+                    title: "Upload not available",
+                    description: "Supabase connection is not configured. Demo mode is active - upload is disabled.",
+                    variant: "destructive"
+                  });
+                  return;
+                }
+                setUploadModalOpen(true);
+              }}
               className="flex items-center gap-2 bg-music-accent/20 hover:bg-music-accent/30 text-music-accent px-6 py-3 rounded-full transition-colors"
             >
               <Upload size={18} />
