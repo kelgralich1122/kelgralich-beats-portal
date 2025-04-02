@@ -3,6 +3,7 @@ import { Track } from "@/utils/musicData";
 import { Play, Pause, Clock, Calendar, Search, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@supabase/supabase-js";
+import GitHubMusicUploader from "./GitHubMusicUploader";
 
 interface TrackListProps {
   tracks: Track[];
@@ -10,6 +11,7 @@ interface TrackListProps {
   setCurrentTrackIndex: (index: number) => void;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
+  onAddTrack?: (track: Track) => void;
 }
 
 // Initialize Supabase client only if URL and key are available
@@ -23,7 +25,8 @@ const TrackList = ({
   currentTrackIndex, 
   setCurrentTrackIndex, 
   isPlaying, 
-  setIsPlaying 
+  setIsPlaying,
+  onAddTrack
 }: TrackListProps) => {
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -272,6 +275,12 @@ const TrackList = ({
     }
   };
 
+  const handleAddTrack = (newTrack: Track) => {
+    if (onAddTrack) {
+      onAddTrack(newTrack);
+    }
+  };
+
   return (
     <section className="py-24 px-4" id="tracks">
       <div className="max-w-7xl mx-auto">
@@ -307,7 +316,10 @@ const TrackList = ({
               )}
             </div>
             
-            {/* Upload button */}
+            {/* GitHub Music Upload Button */}
+            <GitHubMusicUploader onTrackAdded={handleAddTrack} />
+            
+            {/* Supabase Upload button */}
             <button
               onClick={() => {
                 if (!supabaseConfigured) {

@@ -9,13 +9,19 @@ export interface Track {
   description?: string;
 }
 
+// Helper function to create GitHub raw content URLs
+export const createGithubRawUrl = (username: string, repo: string, branch: string, path: string): string => {
+  return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${path}`;
+};
+
+// Example of tracks with GitHub-hosted audio files
 export const tracks: Track[] = [
   {
     id: "track-1",
     title: "Midnight Groove",
     duration: "3:42",
     releaseDate: "2023-12-10",
-    audioSrc: "",
+    audioSrc: "https://raw.githubusercontent.com/mdn/webaudio-examples/master/audio-buffer/viper.mp3",
     coverArt: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
     description: "A smooth beat with deep bass and atmospheric synths."
   },
@@ -24,7 +30,7 @@ export const tracks: Track[] = [
     title: "Urban Lights",
     duration: "4:15",
     releaseDate: "2023-11-05",
-    audioSrc: "",
+    audioSrc: "https://raw.githubusercontent.com/mdn/webaudio-examples/master/audio-buffer/outfoxing.mp3",
     coverArt: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
     description: "Upbeat rhythm with electronic elements and urban vibes."
   },

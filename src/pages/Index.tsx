@@ -87,6 +87,11 @@ const Index = () => {
     setShowMusicPlayer(!showMusicPlayer);
   };
 
+  const addTrack = (newTrack: Track) => {
+    // Add the new track to the beginning of the tracks list
+    setTracks([newTrack, ...tracks]);
+  };
+
   return (
     <div className="bg-gradient-to-b from-music-darker to-music-dark min-h-screen text-white">
       <Navbar />
@@ -97,6 +102,7 @@ const Index = () => {
         setCurrentTrackIndex={setCurrentTrackIndex}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
+        onAddTrack={addTrack}
       />
       <About />
       <Footer />
