@@ -14,61 +14,26 @@ export const createGithubRawUrl = (username: string, repo: string, branch: strin
   return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${path}`;
 };
 
-// Example of tracks with GitHub-hosted audio files
+// Convert Google Drive shareable link to direct download link
+export const convertGoogleDriveLink = (shareableLink: string): string => {
+  // Extract the file ID from the shareable link
+  const match = shareableLink.match(/\/d\/([^\/]+)/);
+  if (!match || !match[1]) return shareableLink;
+  
+  // Create a direct download link with the file ID
+  return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+};
+
+// Example of a track with Google Drive-hosted audio file
 export const tracks: Track[] = [
   {
     id: "track-1",
-    title: "Midnight Groove",
-    duration: "3:42",
-    releaseDate: "2023-12-10",
-    audioSrc: "https://raw.githubusercontent.com/mdn/webaudio-examples/master/audio-buffer/viper.mp3",
-    coverArt: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "A smooth beat with deep bass and atmospheric synths."
-  },
-  {
-    id: "track-2",
-    title: "Urban Lights",
-    duration: "4:15",
-    releaseDate: "2023-11-05",
-    audioSrc: "https://raw.githubusercontent.com/mdn/webaudio-examples/master/audio-buffer/outfoxing.mp3",
-    coverArt: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "Upbeat rhythm with electronic elements and urban vibes."
-  },
-  {
-    id: "track-3",
-    title: "Crystal Flow",
-    duration: "3:28",
-    releaseDate: "2023-10-15",
-    audioSrc: "",
-    coverArt: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "Melodic beats with crystalline sounds and flowing rhythms."
-  },
-  {
-    id: "track-4",
-    title: "Electric Dreams",
-    duration: "5:10",
-    releaseDate: "2023-09-22",
-    audioSrc: "",
-    coverArt: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "Dreamy synths with electric undertones and steady beats."
-  },
-  {
-    id: "track-5",
-    title: "Nebula Rhythm",
-    duration: "4:32",
-    releaseDate: "2023-08-18",
-    audioSrc: "",
-    coverArt: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "Cosmic sounds with rhythmic patterns inspired by space."
-  },
-  {
-    id: "track-6",
-    title: "Velvet Night",
-    duration: "3:55",
-    releaseDate: "2023-07-30",
-    audioSrc: "",
-    coverArt: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "Smooth night vibes with velvet textures and gentle beats."
+    title: "Universal Sound (feat. Kelgralich)",
+    duration: "4:28",
+    releaseDate: "2024-04-03",
+    audioSrc: convertGoogleDriveLink("https://drive.google.com/file/d/1-HiP-UyYPDz-TG1dMyjl10L6aBYesN2a/view?usp=drivesdk"),
+    coverArt: "https://images.unsplash.com/photo-1583173451851-330156818a9d?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
+    description: "An immersive soundscape with deep electronic vibes and atmospheric elements."
   }
 ];
 

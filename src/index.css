@@ -61,20 +61,25 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
+/* Spotify-like glass effect with purple/blue hues */
 .glass-effect {
-  @apply bg-white/10 backdrop-blur-lg border border-white/20;
+  @apply bg-black/30 backdrop-blur-lg border border-white/10;
+  box-shadow: 0 8px 32px rgba(155, 135, 245, 0.15);
 }
 
 .glass-card {
-  @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl transition-all duration-300;
+  @apply bg-black/40 backdrop-blur-md border border-white/5 rounded-xl transition-all duration-300;
+  box-shadow: 0 4px 20px rgba(155, 135, 245, 0.1);
 }
 
 .glass-card:hover {
-  @apply bg-white/10 border-white/20 shadow-lg;
+  @apply bg-black/50 border-white/10;
+  box-shadow: 0 8px 30px rgba(155, 135, 245, 0.2);
+  transform: translateY(-2px);
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-music-accent to-music-highlight;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-music-accent via-purple-400 to-music-highlight;
 }
 
 .track-progress {
@@ -85,31 +90,46 @@ body {
   @apply h-full bg-gradient-to-r from-music-accent to-music-highlight;
 }
 
+/* Enhanced audio wave animation */
 @keyframes audio-wave {
-  0% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
-  100% { transform: scaleY(0.3); }
+  0% { transform: scaleY(0.3); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.3); opacity: 0.4; }
+}
+
+.audio-wave {
+  @apply flex items-center justify-center;
 }
 
 .audio-wave span {
-  @apply inline-block w-[2px] h-5 mx-[1px] bg-music-accent rounded-full;
+  @apply inline-block w-[3px] h-8 mx-[2px] rounded-full;
+  background: linear-gradient(to bottom, #9b87f5, #6d48e5);
   animation: audio-wave 1.2s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(155, 135, 245, 0.5);
+}
+
+.audio-wave span:nth-child(1) {
+  animation-delay: 0s;
 }
 
 .audio-wave span:nth-child(2) {
   animation-delay: 0.2s;
+  height: 30px;
 }
 
 .audio-wave span:nth-child(3) {
   animation-delay: 0.4s;
+  height: 40px;
 }
 
 .audio-wave span:nth-child(4) {
   animation-delay: 0.6s;
+  height: 30px;
 }
 
 .audio-wave span:nth-child(5) {
   animation-delay: 0.8s;
+  height: 20px;
 }
 
 .hover-link {
@@ -129,11 +149,7 @@ body {
   @apply text-music-accent;
 }
 
-.hero-pattern {
-  background-image: radial-gradient(rgba(155, 135, 245, 0.1) 1px, transparent 1px);
-  background-size: 25px 25px;
-}
-
+/* Spotify-like interactive hover effects */
 .hover-scale {
   @apply transition-transform duration-300;
 }
@@ -158,6 +174,7 @@ body {
   @apply bg-music-accent/50;
 }
 
+/* Enhanced waveform animations for playing state */
 @keyframes waveform-1 {
   0%, 100% { transform: scaleY(0.5); }
   50% { transform: scaleY(1); }
@@ -205,4 +222,40 @@ body {
 
 .animation-delay-1000 {
   animation-delay: 1s;
+}
+
+/* Spotify-like glow effects */
+.btn-glow {
+  @apply relative overflow-hidden;
+}
+
+.btn-glow:after {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300;
+  transform: translateX(-100%);
+}
+
+.btn-glow:hover:after {
+  @apply opacity-100;
+  transform: translateX(100%);
+  transition: transform 0.8s ease, opacity 0.3s ease;
+}
+
+/* Album cover hover effect */
+.album-cover {
+  @apply transition-all duration-300 relative;
+}
+
+.album-cover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(155, 135, 245, 0.3);
+}
+
+.album-cover:after {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.album-cover:hover:after {
+  @apply opacity-100;
 }
