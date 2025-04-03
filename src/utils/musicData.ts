@@ -7,6 +7,8 @@ export interface Track {
   audioSrc: string;
   coverArt: string;
   description?: string;
+  artist?: string;
+  producer?: string;
 }
 
 // Helper function to create GitHub raw content URLs
@@ -28,12 +30,25 @@ export const convertGoogleDriveLink = (shareableLink: string): string => {
 export const tracks: Track[] = [
   {
     id: "track-1",
-    title: "Universal Sound (feat. Kelgralich)",
+    title: "Universal Sound",
     duration: "4:28",
     releaseDate: "2024-04-03",
     audioSrc: convertGoogleDriveLink("https://drive.google.com/file/d/1-HiP-UyYPDz-TG1dMyjl10L6aBYesN2a/view?usp=drivesdk"),
     coverArt: "https://images.unsplash.com/photo-1583173451851-330156818a9d?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
-    description: "An immersive soundscape with deep electronic vibes and atmospheric elements."
+    description: "An immersive soundscape with deep electronic vibes and atmospheric elements.",
+    artist: "Kelgralich",
+    producer: "Kelgralich"
+  },
+  {
+    id: "track-2",
+    title: "Siwezi",
+    duration: "3:45", // Approximate duration
+    releaseDate: "2024-04-03",
+    audioSrc: convertGoogleDriveLink("https://drive.google.com/file/d/1-22VCvH1i0r_MkhZzYq6wtlRpwGuw3ID/view?usp=drivesdk"),
+    coverArt: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400",
+    description: "A vibrant and rhythmic track with captivating beats.",
+    artist: "Dvanny",
+    producer: "Kelgralich"
   }
 ];
 

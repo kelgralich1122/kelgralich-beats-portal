@@ -31,6 +31,8 @@ const TrackList = ({
       const filtered = tracks.filter(track => 
         track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         track.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        track.artist?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        track.producer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         track.releaseDate.includes(searchTerm)
       );
       setFilteredTracks(filtered);
@@ -89,8 +91,9 @@ const TrackList = ({
         <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
           <div className="hidden md:grid grid-cols-12 px-6 py-4 text-gray-400 text-sm border-b border-white/10">
             <div className="col-span-1 text-center">#</div>
-            <div className="col-span-5">TITLE</div>
-            <div className="col-span-3 flex items-center gap-1">
+            <div className="col-span-4">TITLE</div>
+            <div className="col-span-2">ARTIST</div>
+            <div className="col-span-2 flex items-center gap-1">
               <Calendar size={16} />
               <span>RELEASE DATE</span>
             </div>
@@ -150,7 +153,7 @@ const TrackList = ({
                       )}
                     </div>
                     
-                    <div className="col-span-11 md:col-span-5 flex items-center gap-4">
+                    <div className="col-span-11 md:col-span-4 flex items-center gap-4">
                       <img 
                         src={track.coverArt} 
                         alt={track.title} 
@@ -158,11 +161,15 @@ const TrackList = ({
                       />
                       <div className="text-left">
                         <h3 className="font-medium text-white truncate">{track.title}</h3>
-                        <p className="text-sm text-gray-400 hidden md:block">Kelgralich</p>
+                        <p className="text-sm text-gray-400 md:hidden">{track.artist || 'Unknown artist'}</p>
                       </div>
                     </div>
                     
-                    <div className="hidden md:block col-span-3 text-gray-400 text-sm">
+                    <div className="hidden md:block col-span-2 text-gray-400 text-sm">
+                      {track.artist || 'Unknown artist'}
+                    </div>
+                    
+                    <div className="hidden md:block col-span-2 text-gray-400 text-sm">
                       {track.releaseDate}
                     </div>
                     

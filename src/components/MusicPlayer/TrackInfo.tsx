@@ -16,7 +16,12 @@ const TrackInfo = ({ currentTrack }: TrackInfoProps) => {
       />
       <div className="truncate">
         <h4 className="text-white font-medium truncate">{currentTrack?.title || 'No track selected'}</h4>
-        <p className="text-gray-400 text-sm">Kelgralich</p>
+        <p className="text-gray-400 text-sm">
+          {currentTrack?.artist || 'Unknown artist'} 
+          {currentTrack?.producer && currentTrack.producer !== currentTrack?.artist && 
+            ` • ${currentTrack.producer}`
+          }
+        </p>
       </div>
     </div>
   );

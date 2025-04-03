@@ -12,8 +12,7 @@ import { X, ListMusic } from "lucide-react";
 const Index = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [tracks, setTracks] = useState<Track[]>(demoTracks);
-  const [loading, setLoading] = useState(false);
+  const [tracks] = useState<Track[]>(demoTracks);
   const [showMusicPlayer, setShowMusicPlayer] = useState(true);
 
   const toggleMusicPlayer = () => {
